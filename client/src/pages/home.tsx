@@ -18,9 +18,14 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Calendar } from "lucide-react";
 import { insertTodoSchema, type Todo } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { toast } = useToast();
@@ -31,6 +36,7 @@ export default function Home() {
     defaultValues: {
       title: "",
       completed: false,
+      dueDate: null,
     },
   });
 
@@ -39,7 +45,7 @@ export default function Home() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: { title: string; completed: boolean }) => {
+    mutationFn: async (data: { title: string; completed: boolean; dueDate: string | null }) => {
       await apiRequest("POST", "/api/todos", data);
     },
     onSuccess: () => {
@@ -96,26 +102,60 @@ export default function Home() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={onSubmit} className="flex gap-2">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormControl>
-                  <Input
-                    placeholder="Add a new todo..."
-                    {...field}
-                    disabled={createMutation.isPending}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={createMutation.isPending}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add
-          </Button>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      placeholder="Add a new todo..."
+                      {...field}
+                      disabled={createMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={cn(
+                          "w-10 h-10",
+                          field.value && "text-primary"
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={field.value ? new Date(field.value) : undefined}
+                        onSelect={(date) =>
+                          field.onChange(date ? date.toISOString() : null)
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={createMutation.isPending}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add
+            </Button>
+          </div>
         </form>
       </Form>
 
@@ -131,13 +171,21 @@ export default function Home() {
                 })
               }
             />
-            <span
-              className={`flex-1 ${
-                todo.completed ? "line-through text-muted-foreground" : ""
-              }`}
-            >
-              {todo.title}
-            </span>
+            <div className="flex-1 space-y-1">
+              <span
+                className={cn(
+                  todo.completed && "line-through text-muted-foreground"
+                )}
+              >
+                {todo.title}
+              </span>
+              {todo.dueDate && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  {format(new Date(todo.dueDate), "PPP")}
+                </div>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="icon"
