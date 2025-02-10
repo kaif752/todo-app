@@ -26,6 +26,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Home() {
   const { toast } = useToast();
@@ -94,11 +95,14 @@ export default function Home() {
 
   return (
     <div className="container max-w-2xl mx-auto p-4 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Todo List</h1>
-        <p className="text-muted-foreground">
-          Keep track of your tasks and stay organized.
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Todo List</h1>
+          <p className="text-muted-foreground">
+            Keep track of your tasks and stay organized.
+          </p>
+        </div>
+        <ThemeToggle />
       </div>
 
       <Form {...form}>
