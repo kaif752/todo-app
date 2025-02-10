@@ -18,8 +18,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Calendar, Flag } from "lucide-react";
-import { insertTodoSchema, type Todo, PriorityLevel } from "@shared/schema";
+import { Plus, Trash2, Calendar, Flag, Tag } from "lucide-react";
+import { insertTodoSchema, type Todo, PriorityLevel, DEFAULT_CATEGORIES } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -34,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 function getPriorityColor(priority: string) {
   switch (priority) {
@@ -59,6 +60,7 @@ export default function Home() {
       completed: false,
       dueDate: null,
       priority: PriorityLevel.MEDIUM,
+      category: null,
     },
   });
 
@@ -67,7 +69,13 @@ export default function Home() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: { title: string; completed: boolean; dueDate: string | null; priority: string }) => {
+    mutationFn: async (data: { 
+      title: string; 
+      completed: boolean; 
+      dueDate: string | null; 
+      priority: string;
+      category: string | null;
+    }) => {
       await apiRequest("POST", "/api/todos", data);
     },
     onSuccess: () => {
@@ -103,7 +111,12 @@ export default function Home() {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    createMutation.mutate(data);
+    // Convert "none" category to null before submitting
+    const submissionData = {
+      ...data,
+      category: data.category === "none" ? null : data.category,
+    };
+    createMutation.mutate(submissionData);
   });
 
   if (isLoading) {
@@ -145,6 +158,30 @@ export default function Home() {
                         className="h-11"
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select
+                      value={field.value || "none"}
+                      onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                    >
+                      <SelectTrigger className="w-[120px] h-11">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No Category</SelectItem>
+                        {DEFAULT_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category.charAt(0).toUpperCase() + category.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />
@@ -243,6 +280,12 @@ export default function Home() {
                       {todo.title}
                     </span>
                     <Flag className={cn("h-4 w-4", getPriorityColor(todo.priority))} />
+                    {todo.category && (
+                      <Badge variant="secondary" className="flex gap-1 items-center">
+                        <Tag className="h-3 w-3" />
+                        {todo.category.charAt(0).toUpperCase() + todo.category.slice(1)}
+                      </Badge>
+                    )}
                   </div>
                   {todo.dueDate && (
                     <div className="flex items-center text-sm text-muted-foreground">
