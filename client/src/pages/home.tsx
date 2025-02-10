@@ -129,13 +129,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="container max-w-2xl mx-auto p-6 space-y-8">
+      <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8 max-w-full md:max-w-2xl">
         <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <div className="space-y-1 md:space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Todo List
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               Keep track of your tasks and stay organized.
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function Home() {
 
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4">
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <FormField
                 control={form.control}
                 name="title"
@@ -161,91 +161,93 @@ export default function Home() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <Select
-                      value={field.value || "none"}
-                      onValueChange={(value) => field.onChange(value === "none" ? null : value)}
-                    >
-                      <SelectTrigger className="w-[120px] h-11">
-                        <SelectValue placeholder="Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No Category</SelectItem>
-                        {DEFAULT_CATEGORIES.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category.charAt(0).toUpperCase() + category.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-[110px] h-11">
-                        <SelectValue placeholder="Priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={PriorityLevel.HIGH}>High</SelectItem>
-                        <SelectItem value={PriorityLevel.MEDIUM}>Medium</SelectItem>
-                        <SelectItem value={PriorityLevel.LOW}>Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className={cn(
-                            "w-11 h-11",
-                            field.value && "text-primary"
-                          )}
-                        >
-                          <CalendarIcon className="h-4 w-4" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
-                          mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) =>
-                            field.onChange(date ? date.toISOString() : null)
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                disabled={createMutation.isPending}
-                className="h-11"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add
-              </Button>
+              <div className="flex gap-2 w-full md:w-auto">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem className="flex-1 md:flex-none">
+                      <Select
+                        value={field.value || "none"}
+                        onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                      >
+                        <SelectTrigger className="w-full md:w-[120px] h-11">
+                          <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No Category</SelectItem>
+                          {DEFAULT_CATEGORIES.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem className="flex-1 md:flex-none">
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full md:w-[110px] h-11">
+                          <SelectValue placeholder="Priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={PriorityLevel.HIGH}>High</SelectItem>
+                          <SelectItem value={PriorityLevel.MEDIUM}>Medium</SelectItem>
+                          <SelectItem value={PriorityLevel.LOW}>Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dueDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className={cn(
+                              "w-11 h-11",
+                              field.value && "text-primary"
+                            )}
+                          >
+                            <CalendarIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={field.value ? new Date(field.value) : undefined}
+                            onSelect={(date) =>
+                              field.onChange(date ? date.toISOString() : null)
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="h-11 whitespace-nowrap"
+                >
+                  <Plus className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Add</span>
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
@@ -259,7 +261,7 @@ export default function Home() {
                 todo.completed && "opacity-80"
               )}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start md:items-center gap-4">
                 <Checkbox
                   checked={todo.completed}
                   onCheckedChange={(checked) =>
@@ -270,7 +272,7 @@ export default function Home() {
                   }
                 />
                 <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span
                       className={cn(
                         "font-medium",
