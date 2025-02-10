@@ -128,11 +128,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8 max-w-full md:max-w-2xl">
         <div className="flex items-center justify-between">
           <div className="space-y-1 md:space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
               Todo List
             </h1>
             <p className="text-sm md:text-base text-muted-foreground">
