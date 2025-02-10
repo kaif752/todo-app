@@ -33,3 +33,9 @@ vite.config.ts.*
 
 # Deployment
 *.tar.gz
+
+# Replit specific
+.replit
+.config
+replit.nix
+.breakpoints
