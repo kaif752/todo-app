@@ -38,11 +38,11 @@ import {
 function getPriorityColor(priority: string) {
   switch (priority) {
     case PriorityLevel.HIGH:
-      return "text-red-500";
+      return "text-rose-500 dark:text-rose-400";
     case PriorityLevel.MEDIUM:
-      return "text-yellow-500";
+      return "text-amber-500 dark:text-amber-400";
     case PriorityLevel.LOW:
-      return "text-green-500";
+      return "text-emerald-500 dark:text-emerald-400";
     default:
       return "";
   }
@@ -115,166 +115,186 @@ export default function Home() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Todo List</h1>
-          <p className="text-muted-foreground">
-            Keep track of your tasks and stay organized.
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <div className="container max-w-2xl mx-auto p-6 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Todo List
+            </h1>
+            <p className="text-muted-foreground">
+              Keep track of your tasks and stay organized.
+            </p>
+          </div>
+          <ThemeToggle />
         </div>
-        <ThemeToggle />
-      </div>
 
-      <Form {...form}>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="flex gap-2">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <Input
-                      placeholder="Add a new todo..."
-                      {...field}
-                      disabled={createMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger className="w-[110px]">
-                      <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={PriorityLevel.HIGH}>High</SelectItem>
-                      <SelectItem value={PriorityLevel.MEDIUM}>Medium</SelectItem>
-                      <SelectItem value={PriorityLevel.LOW}>Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className={cn(
-                          "w-10 h-10",
-                          field.value && "text-primary"
-                        )}
-                      >
-                        <CalendarIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={(date) =>
-                          field.onChange(date ? date.toISOString() : null)
-                        }
-                        initialFocus
+        <Form {...form}>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="flex gap-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input
+                        placeholder="Add a new todo..."
+                        {...field}
+                        disabled={createMutation.isPending}
+                        className="h-11"
                       />
-                    </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={createMutation.isPending}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
-          </div>
-        </form>
-      </Form>
-
-      <div className="space-y-4">
-        {todos.map((todo) => (
-          <Card key={todo.id} className="p-4 flex items-center gap-4">
-            <Checkbox
-              checked={todo.completed}
-              onCheckedChange={(checked) =>
-                toggleMutation.mutate({
-                  id: todo.id,
-                  completed: checked as boolean,
-                })
-              }
-            />
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                <span
-                  className={cn(
-                    todo.completed && "line-through text-muted-foreground"
-                  )}
-                >
-                  {todo.title}
-                </span>
-                <Flag className={cn("h-4 w-4", getPriorityColor(todo.priority))} />
-              </div>
-              {todo.dueDate && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  {format(new Date(todo.dueDate), "PPP")}
-                </div>
-              )}
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-[110px] h-11">
+                        <SelectValue placeholder="Priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={PriorityLevel.HIGH}>High</SelectItem>
+                        <SelectItem value={PriorityLevel.MEDIUM}>Medium</SelectItem>
+                        <SelectItem value={PriorityLevel.LOW}>Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className={cn(
+                            "w-11 h-11",
+                            field.value && "text-primary"
+                          )}
+                        >
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) =>
+                            field.onChange(date ? date.toISOString() : null)
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={createMutation.isPending}
+                className="h-11"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setDeleteId(todo.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </Card>
-        ))}
+          </form>
+        </Form>
 
-        {todos.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No todos yet. Add one above!
-          </div>
-        )}
+        <div className="space-y-4">
+          {todos.map((todo) => (
+            <Card
+              key={todo.id}
+              className={cn(
+                "p-4 transition-all hover:shadow-md",
+                todo.completed && "opacity-80"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <Checkbox
+                  checked={todo.completed}
+                  onCheckedChange={(checked) =>
+                    toggleMutation.mutate({
+                      id: todo.id,
+                      completed: checked as boolean,
+                    })
+                  }
+                />
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "font-medium",
+                        todo.completed && "line-through text-muted-foreground"
+                      )}
+                    >
+                      {todo.title}
+                    </span>
+                    <Flag className={cn("h-4 w-4", getPriorityColor(todo.priority))} />
+                  </div>
+                  {todo.dueDate && (
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {format(new Date(todo.dueDate), "PPP")}
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setDeleteId(todo.id)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+
+          {todos.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <div className="mb-2">📝</div>
+              No todos yet. Add one above!
+            </div>
+          )}
+        </div>
+
+        <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (deleteId) {
+                    deleteMutation.mutate(deleteId);
+                    setDeleteId(null);
+                  }
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (deleteId) {
-                  deleteMutation.mutate(deleteId);
-                  setDeleteId(null);
-                }
-              }}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
