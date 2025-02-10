@@ -11,6 +11,7 @@ export const todos = pgTable("todos", {
 export const insertTodoSchema = createInsertSchema(todos)
   .pick({
     title: true,
+    completed: true,
   })
   .extend({
     title: z.string().min(1, "Title is required").max(100, "Title is too long"),
