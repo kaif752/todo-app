@@ -18,8 +18,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Calendar } from "lucide-react";
-import { insertTodoSchema, type Todo } from "@shared/schema";
+import { Plus, Trash2, Calendar, Flag } from "lucide-react";
+import { insertTodoSchema, type Todo, PriorityLevel } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -27,6 +27,26 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+function getPriorityColor(priority: string) {
+  switch (priority) {
+    case PriorityLevel.HIGH:
+      return "text-red-500";
+    case PriorityLevel.MEDIUM:
+      return "text-yellow-500";
+    case PriorityLevel.LOW:
+      return "text-green-500";
+    default:
+      return "";
+  }
+}
 
 export default function Home() {
   const { toast } = useToast();
@@ -38,6 +58,7 @@ export default function Home() {
       title: "",
       completed: false,
       dueDate: null,
+      priority: PriorityLevel.MEDIUM,
     },
   });
 
@@ -46,7 +67,7 @@ export default function Home() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: { title: string; completed: boolean; dueDate: string | null }) => {
+    mutationFn: async (data: { title: string; completed: boolean; dueDate: string | null; priority: string }) => {
       await apiRequest("POST", "/api/todos", data);
     },
     onSuccess: () => {
@@ -125,6 +146,27 @@ export default function Home() {
             />
             <FormField
               control={form.control}
+              name="priority"
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={PriorityLevel.HIGH}>High</SelectItem>
+                      <SelectItem value={PriorityLevel.MEDIUM}>Medium</SelectItem>
+                      <SelectItem value={PriorityLevel.LOW}>Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="dueDate"
               render={({ field }) => (
                 <FormItem>
@@ -176,13 +218,16 @@ export default function Home() {
               }
             />
             <div className="flex-1 space-y-1">
-              <span
-                className={cn(
-                  todo.completed && "line-through text-muted-foreground"
-                )}
-              >
-                {todo.title}
-              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    todo.completed && "line-through text-muted-foreground"
+                  )}
+                >
+                  {todo.title}
+                </span>
+                <Flag className={cn("h-4 w-4", getPriorityColor(todo.priority))} />
+              </div>
               {todo.dueDate && (
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-3 w-3 mr-1" />
